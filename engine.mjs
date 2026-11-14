@@ -212,6 +212,9 @@ export function simulate(flow, person) {
       const due=marketing ? nextWindow(at,flow,person.zone) : at
       const adjusts=due!==null && due!==at
       const rejected=person.stopped?'全配信停止':person.blocked?'LINEでブロックされています':!person.consent?'目的別の同意なし':
+        person.eligible===false?'店舗の利用適格性が未確認':person.contractActive===false?'契約に有効な配信権限がありません':
+        person.budgetAvailable===false?'利用可能な配信枠なし':
+        (node.body.match(/\{\{\s*(booking|booking_url)\s*\}\}/) && person.bookingCurrent===false)?'予約の版が更新されています':
         marketing && person.marketingStopped?'販促停止':marketing && !person.adult?'20歳以上の確認なし':
         person.cancelled?'予約取消・辞退':marketing && person.responded?'返信があるため販促を保留':person.human?'有人対応中':due===null?'配信可能時間外':null
       const frequency=marketing && due!==null && (

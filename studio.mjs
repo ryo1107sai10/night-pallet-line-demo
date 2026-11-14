@@ -10,7 +10,7 @@ const waitTypes={delay:'相対時間',fixed:'実日付',business:'営業日・�
 const steps={draft:'下書き',tested:'テスト済み',approved:'承認済み'}
 const defaults={zone:'Asia/Tokyo',cutoff:'06:00',start:'',bookingAt:'',booked:false,consent:true,adult:true,responded:false,
   assigned:true,stopped:false,marketingStopped:false,blocked:false,human:false,cancelled:false,
-  dayCount:0,weekCount:0,tags:[],bookingLinkValid:true}
+  dayCount:0,weekCount:0,tags:[],bookingLinkValid:true,eligible:true,contractActive:true,budgetAvailable:true,bookingCurrent:true}
 let person={...defaults,values:{name:'水城あおい',store:'銀座店（サンプル）',staff:'橘',booking:'11月16日 23:00',
   price:'60分 8,000円（税込）',booking_url:'https://example.test/reservations/sample'}}
 let scenario,graph,selection,scenarioList=[],stores=[],channels=[],store,original='',dirty=false,tab='edit',part='workspace',simulation
@@ -337,8 +337,8 @@ function flowView() {
     root.replaceChildren(panelHead('配信フロー'),node('p','「新規シナリオ」から配信の流れを設計できます。','empty'))
     return
   }
-  const title=panelHead(graph.name||'名称未設定',purposes[graph.purpose]+'向け  ·  '+(channels.find(item=>item.id===graph.channel)?.label??'公式アカウント未選択'))
-  title.classList.add('editor-head')
+  const title=node('div',null,'panelhead editor-head')
+  title.append(panelHead(graph.name||'名称未設定',purposes[graph.purpose]+'  ·  '+(channels.find(item=>item.id===graph.channel)?.label??'公式アカウント未選択')))
   title.append(pill(scenario?.stopped?'停止中':scenario?.published_version?'公開版 v'+scenario.published_version:steps[scenario?.state??'draft'],
     scenario?.stopped?'warn':scenario?.published_version?'good':''))
   const bar=node('div',null,'toolbar')
@@ -501,6 +501,37 @@ function nowInZone(zone) {
   return p.year+'-'+p.month+'-'+p.day+'T'+p.hour+':'+p.minute
 }
 
+async function testDelivery() {
+  const results=simulation?.events.filter(event=>event.message)??[]
+  if (!results.length || dirty || !scenario) throw new Error('下書きを保存し、送信予定のあるシミュレーションを実行してください。')
+  const url=base()+'/'+scenario.id
+  const candidates=await api(url+'/testers')
+  const jobs=await api(url+'/test-sends')
+  const box=node('div')
+  const labels={queued:'待機中',submitting:'LINEへ提出中',accepted:'LINE受付済',failed:'失敗',unknown:'結果不明',cancelled:'取消'}
+  let recipient=candidates[0]?.id
+  let selected=results[0].id
+  const key=crypto.randomUUID()
+  box.append(field('テスト送信するステップ',selected,value=>{selected=value},{
+    items:Object.fromEntries(results.map(item=>[item.id,item.name])),
+  }))
+  if (!candidates.length) box.append(node('p','店舗・LINE接続画面で、同じ公式アカウントと用途のテスト利用者を新たに認証してください。'))
+  else box.append(field('認証済みテスト利用者',recipient,value=>{recipient=value},{
+    items:Object.fromEntries(candidates.map(({id,verified_at})=>[id,'認証 '+new Date(verified_at).toLocaleString('ja-JP')+' · '+id.slice(0,8)])),
+  }),button('テスト利用者に1通送る',async()=>{
+    const {zone,cutoff,...fixture}=person
+    await api(url+'/test-sends','POST',{revision:scenario.revision,node:selected,tester:recipient,fixture},key)
+    $('#dialog').close()
+    announce('テスト送信を登録しました。送信結果はテスト送信画面で確認できます。')
+  },'primary'))
+  if (jobs.length) {
+    const statuses=node('ul',null,'log')
+    for(const item of jobs) statuses.append(node('li',new Date(item.created_at).toLocaleString('ja-JP')+' · '+labels[item.status]))
+    box.append(statuses)
+  }
+  dialog('登録済み利用者へのテスト送信','シミュレーションで選ばれたメッセージをテスト表示付きで1通送ります。',box)
+}
+
 function resultView() {
   const wrap=node('div')
   const failures=limits()
@@ -521,6 +552,7 @@ function resultView() {
     if (out) out.replaceChildren()
     const record=$('#mark-tested')
     if (record) record.disabled=true
+    $('#test-delivery')?.remove()
   }
   const presets=field('テスト条件',preset,value=>{
     preset=value
@@ -534,7 +566,8 @@ function resultView() {
   more.append(node('summary','対象者と配信条件'))
   const flags={booked:'予約あり',consent:'目的別同意あり',adult:'20歳以上を確認済み',blocked:'LINEブロック',
     stopped:'全配信停止',marketingStopped:'販促停止',responded:'返信あり',human:'有人対応中',assigned:'担当者あり',cancelled:'予約取消または辞退',
-    bookingLinkValid:'予約変更URLの有効性を確認済み'}
+    bookingLinkValid:'予約変更URLの有効性を確認済み',eligible:'店舗の利用適格性を確認済み',
+    contractActive:'契約上の配信権限あり',budgetAvailable:'利用可能な配信枠あり',bookingCurrent:'最新の予約版を参照'}
   for (const [key,label] of Object.entries(flags)) more.append(field(label,person[key],set(key),{type:'checkbox'}))
   more.append(field('予約日時',person.bookingAt,set('bookingAt'),{type:'datetime-local'}))
   for (const [key,label] of Object.entries(variables)) more.append(field(label,person.values[key],value=>{person.values[key]=value;simulation=null;clearResult()},{event:'input'}))
@@ -570,6 +603,11 @@ function resultView() {
     output.append(node('p','概算 '+simulation.count+' 通','compact'),list)
   }
   wrap.append(output)
+  if (!demo && scenario && !dirty && simulation?.count>0) {
+    const send=button('テスト送信・履歴',testDelivery)
+    send.id='test-delivery'
+    wrap.append(send)
+  }
   if (scenario?.state==='draft'&&!dirty) {
     const mark=button('テスト済みにする',()=>transition('test'))
     mark.id='mark-tested'

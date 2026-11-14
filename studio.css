@@ -59,6 +59,7 @@ label.check{min-height:38px;display:flex;align-items:center;gap:9px;color:#d8d8e
 .scenario-card strong{display:block;font-size:13px;line-height:1.6;margin-bottom:7px;overflow-wrap:anywhere}
 .scenario-card .labels{display:flex;flex-wrap:wrap;gap:6px}
 .editor-head{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.editor-head>.panelhead{padding:0;border:0;min-width:0}
 .editor-head h2{font-size:19px;overflow-wrap:anywhere}
 .controls,.toolbar,.tabs{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
 .toolbar{padding:10px 13px;border-bottom:1px solid var(--stroke);background:#10152945}
