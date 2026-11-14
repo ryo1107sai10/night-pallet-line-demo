@@ -1,46 +1,37 @@
 <!doctype html>
-<html lang="ja">
+<html lang="ja" data-mode="demo" data-settings="./settings/">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NIGHT pallet LINE | G1 管理画面デモ</title>
-  <link rel="stylesheet" href="./style.css">
-  <script type="module" src="./admin.mjs"></script>
+  <meta name="theme-color" content="#101025">
+  <title>シナリオスタジオ | NIGHT pallet LINE</title>
+  <link rel="stylesheet" href="./studio.css">
+  <script type="module" src="./studio.mjs"></script>
 </head>
 <body>
-  <header><div class="header-inner"><a href="./" class="brand">NIGHT pallet <strong>LINE</strong></a><span id="account"></span></div></header>
-  <main id="main">
-    <section class="demo" aria-label="デモの案内"><div><h2>G1 管理画面デモ</h2><p>架空の店舗・公式アカウントで接続の進捗や配信停止を確認できます。認証・LINE通信は模擬し、変更は再読み込みで元に戻ります。</p></div><button id="reset-demo" type="button" class="secondary">最初の状態に戻す</button></section>
-    <p id="notice" role="status" aria-live="polite"></p>
-    <section id="workspace" hidden>
-      <div class="heading">
-        <div><p class="section-label">法人</p><h1 id="tenant-name"></h1></div>
-        <span class="status">閲覧用サンプル</span>
+  <a class="skip" href="#work">編集画面へ移動</a>
+  <header class="top glass">
+    <a class="logo" href="./" aria-label="NIGHT pallet LINE"><span class="mark" aria-hidden="true">◒</span><span>NIGHT <b>pallet</b><small>LINE STUDIO</small></span></a>
+    <nav aria-label="メインメニュー"><a href="./" aria-current="page">シナリオ</a><a id="settings-link">店舗・LINE接続 <span aria-hidden="true">↗</span></a></nav>
+    <div class="righthead"><span id="mode" class="pill" hidden>公開デモ</span><label class="sr" for="store">店舗</label><select id="store"></select></div>
+  </header>
+  <main id="work">
+    <header class="hero">
+      <div>
+        <h1>シナリオ<span>スタジオ</span></h1>
+        <p>LINE配信の流れを設計し、配信前に分岐と除外条件を確認。</p>
       </div>
-      <div id="content"></div>
-    </section>
+      <button id="new" class="primary" type="button"><b aria-hidden="true">＋</b> 新規シナリオ</button>
+    </header>
+    <div id="message" role="status" aria-live="polite" hidden></div>
+    <nav class="mobile glass" aria-label="作業画面"><button data-part="library">シナリオ</button><button data-part="workspace" aria-current="true">フロー</button><button data-part="inspector">設定・プレビュー</button></nav>
+    <div id="layout" class="layout" data-part="workspace">
+      <aside id="library" class="panel glass" aria-label="シナリオ一覧"></aside>
+      <section id="workspace" class="panel glass" aria-label="配信フロー"></section>
+      <aside id="inspector" class="panel glass" aria-label="編集と配信確認"></aside>
+    </div>
+    <footer><span>NIGHT pallet LINE</span><span id="foot"></span></footer>
   </main>
-  <template id="store-fields">
-    <label>店舗名<input name="name" maxlength="100" required></label>
-    <label>所在地<input name="address" maxlength="240" required></label>
-    <label>営業区分<input name="business_type" maxlength="120" required></label>
-    <label>責任者<input name="responsible" maxlength="120" required></label>
-    <label>タイムゾーン<input name="timezone" value="Asia/Tokyo" required></label>
-    <label>営業日の締め時刻<input name="cutoff" type="time" value="06:00" required></label>
-  </template>
-  <template id="channel-fields">
-    <label>公式アカウント名<input name="label" required></label>
-    <label>用途<select name="purpose"><option value="customer">顧客</option><option value="recruitment">採用</option><option value="shared">顧客・採用兼用</option></select></label>
-    <label>所有法人<input name="owner_name" required></label>
-    <label>管理権限の確認記録<input name="management_authority" required></label>
-    <label>プロバイダーID<input name="provider_id" required></label>
-    <label>Messaging API チャネルID<input name="messaging_id" inputmode="numeric" required></label>
-    <label>LINEログイン チャネルID<input name="login_id" inputmode="numeric" required></label>
-    <label>LIFF ID<input name="liff_id" required></label>
-    <label>ボットユーザーID<input name="bot_user_id" required></label>
-    <label>認証種別<select name="account_type"><option value="unverified">未認証</option><option value="verified">認証済み</option><option value="premium">プレミアム</option></select></label>
-    <label>既存Webhook URL<input name="existing_webhook" type="url" placeholder="任意"></label>
-    <label>利用中のツール<input name="existing_tools" placeholder="任意"></label>
-  </template>
+  <dialog id="dialog" class="glass"></dialog>
 </body>
 </html>
