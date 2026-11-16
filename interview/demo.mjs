@@ -16,9 +16,8 @@ function demoSlots(){
     for(const [row,time] of times.entries()){
       if((day*2+row)%7===0)continue
       const begin=Date.parse(date+'T'+time+':00+09:00')
-      const method=(day+row)%3===0?'online':'onsite'
       slots.push({date,id:date+'/'+time,starts_at:new Date(begin).toISOString(),
-        ends_at:new Date(begin+30*60000).toISOString(),method,available:begin>Date.now()&&(day+row*2)%5!==0})
+        ends_at:new Date(begin+30*60000).toISOString(),method:'onsite',available:begin>Date.now()&&(day+row*2)%5!==0})
     }
   }
   return slots
@@ -37,7 +36,7 @@ function available(id,list){
 }
 function appointment(slot){
   return {slot_id:slot.id,method:slot.method,starts_at:slot.starts_at,ends_at:slot.ends_at,
-    instructions:slot.method==='onsite'?'サンプル会場：銀座店 受付にて面談予約のお名前をお伝えください。':'サンプル面談：開始時刻までに担当者の案内をご確認ください。'}
+    instructions:'サンプル会場：銀座店 受付にて面談予約のお名前をお伝えください。'}
 }
 const root=document.querySelector('#interview')
 await mountInterview(root,{
