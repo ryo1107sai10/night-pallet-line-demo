@@ -74,3 +74,5 @@ body.has-interviews main.auth{max-width:min(1120px,calc(100vw - 30px))}
 .interview-app .demo-availability-status{color:#563284;font-size:14px;font-weight:650}
 .interview-app .demo-availability-status:not(:empty){padding:12px 0}
 .interview-app .demo-availability-status:empty{height:16px}
+.interview-app .interview-option{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#f7f2fb;color:var(--ink);font-size:14px;font-weight:650;cursor:pointer}
+.interview-app .interview-option input{width:18px;height:18px;min-height:0;margin:0;padding:0;flex:0 0 auto;accent-color:var(--accent)}
