@@ -53,3 +53,4 @@ pre { padding: 12px; background: #edf1f9; white-space: pre-wrap; overflow-wrap: 
 .demo div { flex: 1 1 460px; }
 .demo h2 { margin-bottom: 4px; }
 .demo p { margin-bottom: 0; }
+.studio-link { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 14px; border-radius: 8px; background: #223d72; color: #fff; text-decoration: none; font-weight: 650; }
