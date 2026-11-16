@@ -1,5 +1,8 @@
 import {defaultHours} from './hours.mjs'
 import {configureHours} from './hours-form.mjs'
+import {drawAvailability} from './availability.mjs'
+import {localInstant} from '../engine.mjs'
+import {readAvailability,saveAvailability} from './demo-availability.mjs'
 
 const key='night-pro-interview-hours'
 export function loadHours(){
@@ -28,4 +31,34 @@ if(form){
     configureHours(form,defaultHours)
     save(defaultHours)
   }
+}
+
+
+const availability=document.querySelector('#availability')
+if(availability){
+  const report=text=>{document.querySelector('#availability-status').textContent=text}
+  const draw=()=>{
+    const state=readAvailability()
+    drawAvailability(availability,{google:{configured:true,connected:state.google},
+      blocks:state.blocks.filter(item=>Date.parse(item.ends_at)>Date.now())},'Asia/Tokyo',{
+      demo:true,localInstant,report,
+      toggleDemo:enabled=>{
+        saveAvailability({...readAvailability(),google:enabled})
+        draw()
+        report(enabled?'各日20:15〜21:00のサンプル予定を面談カレンダーに反映しました。':'サンプル予定の反映を停止しました。')
+      },
+      add:input=>{
+        if(Date.parse(input.ends_at)-Date.parse(input.starts_at)>31*86400000)throw new Error('受付停止期間は31日以内で指定してください。')
+        const latest=readAvailability()
+        saveAvailability({...latest,blocks:[...latest.blocks,{...input,id:crypto.randomUUID()}]})
+        draw();report('受付停止時間を追加しました。')
+      },
+      remove:id=>{
+        const latest=readAvailability()
+        saveAvailability({...latest,blocks:latest.blocks.filter(item=>item.id!==id)})
+        draw();report('受付停止時間を解除しました。')
+      },
+    })
+  }
+  draw()
 }
