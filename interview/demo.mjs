@@ -1,4 +1,4 @@
-import {dateKey,mountInterview} from './calendar.mjs'
+import {dateKey,mountInterview} from './calendar.mjs?v=2'
 import {clockLabel, fitsHours, timeOptions} from './hours.mjs'
 import {loadHours} from './demo-hours.mjs'
 
