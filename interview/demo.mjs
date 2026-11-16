@@ -1,4 +1,6 @@
 import {dateKey,mountInterview} from './calendar.mjs'
+import {clockLabel, fitsHours, timeOptions} from './hours.mjs'
+import {loadHours} from './demo-hours.mjs'
 
 const key='night-pro-interview-demo-v1'
 const timezone='Asia/Tokyo'
@@ -7,7 +9,7 @@ const startDay=Date.parse(today+'T00:00:00Z')
 const dayMs=86400000
 function demoSlots(){
   const slots=[]
-  const times=['11:00','12:30','14:00','15:30','17:00','18:30']
+  const times=timeOptions(0,1440).map(clockLabel)
   for(let day=0;day<=96;day++){
     const date=new Date(startDay+day*dayMs).toISOString().slice(0,10)
     for(const [row,time] of times.entries()){
@@ -27,7 +29,8 @@ const save=data=>localStorage.setItem(key,JSON.stringify(data))
 const conflict=message=>Object.assign(new Error(message),{status:409})
 const slots=demoSlots()
 function available(id,list){
-  const slot=slots.find(slot=>slot.id===id&&slot.available&&Date.parse(slot.starts_at)>Date.now())
+  const slot=slots.find(slot=>slot.id===id&&slot.available&&Date.parse(slot.starts_at)>Date.now()
+    &&fitsHours(slot.starts_at,slot.ends_at,timezone,loadHours()))
   if(!slot||list.some(item=>item.status==='confirmed'&&item.slot_id===id))throw conflict('この枠は予約できなくなりました。空き枠を選び直してください。')
   return slot
 }
@@ -41,7 +44,7 @@ await mountInterview(root,{
   async calendar(start=today){
     const end=new Date(Date.parse(start+'T00:00:00Z')+7*dayMs).toISOString().slice(0,10)
     const saved=bookings()
-    return {store:'銀座店（サンプル）',timezone,today,bookings:saved.slice(0,10),
+    return {store:'銀座店（サンプル）',timezone,today,hours:loadHours(),bookings:saved.slice(0,10),
       slots:slots.filter(slot=>slot.date>=start&&slot.date<end).map(slot=>({...slot,
         available:slot.available&&Date.parse(slot.starts_at)>Date.now()&&!saved.some(b=>b.slot_id===slot.id&&b.status==='confirmed')}))}
   },

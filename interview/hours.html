@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>面談の受付時間 | Night PRO LINE</title>
+<link rel="stylesheet" href="./calendar.css"><script type="module" src="./demo-hours.mjs"></script>
+</head>
+<body class="interview-page">
+<header class="interview-header"><a href="../">Night PRO LINE</a><a href="./">面談予約に戻る</a></header>
+<main id="interview" class="interview-app">
+<header class="hero"><h1>受付時間の設定</h1><p>銀座店（サンプル） · 管理画面デモ</p></header>
+<section class="box stack">
+<h2>カレンダーの表示範囲</h2>
+<form id="interview-hours" class="stack">
+<div class="time-fields">
+<label class="field">受付開始<select name="start" required></select></label>
+<label class="field">受付終了<select name="end" required></select></label>
+</div>
+<p>30分刻みで選べます。設定はこのブラウザのデモに反映されます。</p>
+<div class="controls"><button type="submit" class="primary">受付時間を保存する</button><button type="button" id="restore-hours">既定の時間に戻す</button></div>
+<p id="hours-status" role="status"></p>
+</form>
+</section>
+</main>
+</body>
+</html>
