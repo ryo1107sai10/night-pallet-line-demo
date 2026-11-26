@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja" data-mode="demo" data-settings="/master/">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101025">
+  <title>シナリオスタジオ | Night PRO LINE</title>
+  <link rel="stylesheet" href="./studio.css?v=intake-20261126-r1">
+  <script type="module" src="./studio.mjs?v=intake-20261126-r1"></script>
+</head>
+<body>
+  <a class="skip" href="#work">編集画面へ移動</a>
+  <header class="top glass">
+    <a class="logo" href="./" aria-label="Night PRO LINE"><span class="mark" aria-hidden="true">◒</span><span>Night <b>PRO LINE</b><small>STUDIO</small></span></a>
+    <nav aria-label="メインメニュー"><a href="./" aria-current="page">シナリオ</a><a id="studio-operations" href="/night-pallet-line-demo/role-demo/operations/">顧客・予約</a><a id="settings-link">店舗・LINE接続 <span aria-hidden="true">↗</span></a></nav>
+    <div class="righthead"><span id="mode" class="pill" hidden>公開デモ</span><label class="sr" for="store">店舗</label><select id="store"></select></div>
+  </header>
+  <main id="work">
+    <header class="hero">
+      <div>
+        <h1>シナリオ<span>スタジオ</span></h1>
+        <p>作成 → テスト → 承認 → 公開</p>
+      </div>
+      <div class="controls"><button id="interview-intake" type="button">面談までの基本の型</button><button id="tag-templates" type="button">タグ別テンプレート</button><button id="saved-templates" type="button">保存済みテンプレート</button><button id="new" class="primary" type="button"><b aria-hidden="true">＋</b> 新規シナリオ</button></div>
+    </header>
+    <section id="workbar" class="glass workbar" aria-label="シナリオ編集操作"></section>
+    <section id="journey" class="journey glass" aria-label="公開までの進行状況" hidden></section>
+    <div id="message" role="status" aria-live="polite" hidden></div>
+    <nav class="mobile glass" aria-label="作業画面"><button data-part="library">シナリオ</button><button data-part="workspace" aria-current="true">フロー</button><button data-part="inspector">編集・テスト</button></nav>
+    <div id="layout" class="layout" data-part="workspace">
+      <aside id="library" class="panel glass" aria-label="シナリオ一覧"></aside>
+      <div id="library-resize" class="panel-resize" role="separator" aria-label="一覧の幅" aria-orientation="vertical" tabindex="0"></div>
+      <section id="workspace" class="panel glass" aria-label="配信フロー"></section>
+      <div id="inspector-resize" class="panel-resize" role="separator" aria-label="設定欄の幅" aria-orientation="vertical" tabindex="0"></div>
+      <aside id="inspector" class="panel glass" aria-label="編集と配信確認"></aside>
+    </div>
+    <footer><span>Night PRO LINE</span><span id="foot"></span></footer>
+  </main>
+  <button id="sheet-backdrop" type="button" aria-hidden="true" tabindex="-1" hidden></button>
+  <dialog id="dialog" class="glass"></dialog>
+</body>
+</html>

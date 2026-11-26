@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>店舗運用 | Night PRO LINE</title>
+  <link rel="stylesheet" href="/night-pallet-line-demo/role-demo/static/style.css">
+  <script type="module" src="/night-pallet-line-demo/role-demo/static/agency.mjs"></script>
+</head>
+<body>
+  <header><div class="header-inner">
+    <a class="brand" href="/night-pallet-line-demo/role-demo/master/">Night <strong>PRO LINE</strong></a>
+    <span id="agency-account"></span>
+  </div></header>
+  <main><div class="demo-banner"><strong>操作デモ</strong>　架空データのみ・本番やLINEに反映されません。 <a href="/night-pallet-line-demo/role-demo/">デモの選択</a></div>
+    <div class="heading">
+      <h1 id="agency-name">店舗運用</h1>
+      <button type="button" id="agency-logout" class="secondary">デモ入口に戻る</button>
+    </div>
+    <p id="agency-status" role="status"></p>
+    <section id="operations-dashboard" class="panel" hidden></section>
+    <section id="agency-health" class="panel" hidden></section>
+    <section id="agency-stores" class="panel" hidden>
+      <label>操作する店舗 <select id="agency-store"></select></label>
+    </section>
+    <section id="agency-store-management" class="panel" hidden>
+      <h2>契約店舗の登録・運用設定</h2>
+      <p>管理会社の現マスターは自社の契約店舗を登録し、利用条件の確認・採用機能・配信設定を管理できます。</p>
+      <details>
+        <summary>＋ 新しい契約店舗を登録</summary>
+        <form id="agency-store-create">
+          <label>店舗名 <input name="name" maxlength="100" required></label>
+          <label>所在地 <input name="address" maxlength="240" required></label>
+          <label>営業区分 <input name="business_type" maxlength="120" required></label>
+          <label>責任者 <input name="responsible" maxlength="120" required></label>
+          <label>タイムゾーン <input name="timezone" value="Asia/Tokyo" required></label>
+          <label>営業日の締め時刻 <input name="cutoff" type="time" value="06:00" required></label>
+          <button type="submit">店舗を登録</button>
+        </form>
+      </details>
+      <div id="agency-store-setup" hidden>
+        <h3 id="agency-store-setup-name">選択店舗の設定</h3>
+        <p id="agency-store-setup-state" aria-live="polite"></p>
+        <details>
+          <summary>1. 店舗の利用適格性</summary>
+          <form id="agency-store-eligibility">
+            <label><input type="checkbox" name="verified"> 許可・届出およびLINE利用条件を確認済み</label>
+            <label>確認記録の参照・確認者 <input name="reference" maxlength="200" required></label>
+            <button type="submit">適格性を保存</button>
+          </form>
+        </details>
+        <details>
+          <summary>2. 採用・面談機能の設定</summary>
+          <form id="agency-store-features">
+            <div id="agency-feature-options" class="controls"></div>
+            <button type="button" id="agency-feature-defaults" class="secondary">採用基本機能を選択</button>
+            <button type="submit">採用機能を保存</button>
+          </form>
+        </details>
+        <details>
+          <summary>3. 契約確認・採用自動配信</summary>
+          <form id="agency-store-automation">
+            <p id="agency-automation-ready" class="muted"></p>
+            <label><input type="checkbox" name="contract"> 店舗の契約・LINE運用の許可を確認済み</label>
+            <label><input type="checkbox" name="enabled"> 通常の採用自動配信を有効化</label>
+            <label>月あたりの送信上限 <input type="number" name="monthly_limit" min="1" max="1000000" required></label>
+            <label>確認者・変更理由 <input name="reason" maxlength="200" required></label>
+            <p class="muted">契約確認と自動配信の有効化は別です。本人同意・LINE接続・利用条件・配信処理の準備が必要です。</p>
+            <button type="submit">契約・配信設定を保存</button>
+          </form>
+        </details>
+      </div>
+      <p id="agency-store-management-status" role="status"></p>
+    </section>
+    <div class="controls" id="agency-tools" hidden>
+      <section id="agency-line" class="panel" hidden>
+        <h2>公式LINEの接続</h2>
+        <p>店舗の採用用公式LINEを登録し、送受信の確認を行います。</p>
+        <a class="studio-link" id="agency-line-link">公式LINEを接続・確認する</a>
+      </section>
+      <section id="agency-steps" class="panel">
+        <h2>ステップ配信</h2>
+        <p>店舗の公式LINEで使うシナリオを作成・編集します。</p>
+        <a class="studio-link" id="agency-studio">ステップ配信を開く</a>
+      </section>
+      <section id="agency-forms" class="panel">
+        <h2>応募フォーム</h2>
+        <p>担当店舗の採用応募フォームを作成・編集・公開し、回答を確認します。</p>
+        <div class="actions"><a class="studio-link" id="agency-form-editor">応募フォームを管理</a><a class="studio-link" id="agency-form-responses">応募回答を確認</a></div>
+      </section>
+      <section id="agency-tags" class="panel">
+        <h2>採用タグ・絞り込み配信</h2>
+        <p>応募者の分類、自動タグ付け、タグを使った配信を管理します。</p>
+        <div class="actions"><a class="studio-link" id="agency-tag-manager">採用タグを管理</a><a class="studio-link" id="agency-recruitment">応募・選考管理</a></div>
+      </section>
+      <section id="agency-acquisition" class="panel" hidden>
+        <h2>流入分析・リッチメニュー</h2>
+        <p>店舗ごとの応募経路、QRコード、採用タグ別メニュー、導入時の運用チェックを管理します。</p>
+        <div class="actions"><a class="studio-link" id="agency-sources">流入分析</a><a class="studio-link" id="agency-menus">リッチメニュー</a><a class="studio-link" id="agency-checks">運用チェック</a></div>
+      </section>
+      <section id="agency-interview" class="panel">
+        <h2>面談予約</h2>
+        <p>Googleカレンダーの連携、空き枠、受付時間を管理します。</p>
+        <div class="actions"><a class="studio-link" id="agency-calendar">面談枠とカレンダー</a><a class="studio-link" id="agency-inbox">採用LINEの受信箱・通知履歴</a></div>
+      </section>
+    </div>
+    <section id="agency-master" class="panel" hidden>
+      <h2>マスター管理・引き継ぎ</h2>
+      <div id="agency-master-content"></div>
+      <p id="agency-master-status" role="status"></p>
+    </section>
+  </main>
+</body>
+</html>

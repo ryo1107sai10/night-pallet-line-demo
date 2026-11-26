@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>管理会社の監督 | Night PRO LINE</title>
+  <link rel="stylesheet" href="/night-pallet-line-demo/role-demo/static/style.css">
+  <script type="module" src="/night-pallet-line-demo/role-demo/static/platform.mjs"></script>
+</head>
+<body>
+  <header><div class="header-inner">
+    <a href="/night-pallet-line-demo/role-demo/platform/" class="brand">Night <strong>PRO LINE</strong></a>
+    <span id="account"></span>
+  </div></header>
+  <main><div class="demo-banner"><strong>操作デモ</strong>　架空データのみ・本番やLINEに反映されません。 <a href="/night-pallet-line-demo/role-demo/">デモの選択</a></div>
+    <div class="heading">
+      <h1>管理会社の監督</h1>
+      <div class="actions">
+        <a class="studio-link" href="/night-pallet-line-demo/role-demo/platform/tours/">画面ツアーを編集</a>
+        <button type="button" class="secondary" id="logout">デモ入口に戻る</button>
+      </div>
+    </div>
+    <p id="notice" role="status"></p>
+    <section class="panel">
+      <h2>管理会社</h2>
+      <ul class="onboarding-list" id="tenants"></ul>
+    </section>
+    <section class="panel" id="platform-health" hidden></section>
+    <section class="panel">
+      <h2>新規登録</h2>
+      <p class="muted">法人名・店舗名・エール担当者のメールアドレスだけで登録を始められます。法人と店舗の作成、担当者への招待、初期設定（基本機能と面談受付時間 18:00〜24:00）の適用までを一括で行います。店舗の詳しい設定は、招待を受け取ったエール担当者が管理画面のセットアップ手順で決めます。</p>
+      <form id="registration-form">
+        <label>法人名<input name="legal_name" maxlength="120" required></label>
+        <label>店舗名<input name="store_name" maxlength="100" required></label>
+        <label>エール担当者のメールアドレス<input name="email" type="email" maxlength="254" required></label>
+        <button type="submit">デモ登録・招待手順を試す</button>
+      </form>
+      <pre id="registration-result" hidden></pre>
+    </section>
+    <section class="panel">
+      <h2>登録の進捗</h2>
+      <p class="muted">どの店舗の登録がどこで止まっているかを確認できます。承認のための画面ではありません。</p>
+      <ul class="onboarding-list" id="registration-progress"></ul>
+      <button type="button" class="secondary" id="progress-refresh">進捗を更新</button>
+    </section>
+  </main>
+</body>
+</html>
