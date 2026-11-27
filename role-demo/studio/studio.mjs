@@ -1,4 +1,4 @@
-import {readDemoStores,role} from '../static/demo-runtime.mjs'
+import {readDemoStores,role,readState,writeState} from '../static/demo-runtime.mjs'
 import {intakeTemplate,consentPrompt,intakeVariable} from './interview-intake-template.mjs'
 import {workspacePath,scopeWorkspaceLinks} from '/night-pallet-line-demo/role-demo/static/workspace-path.mjs'
 import {starter,recruitmentTemplates,recruitmentTemplate,kinds,conditions,triggers,liveTriggers,variables,validate,simulate,renderMessage,links,branchRules,timelineActions} from './engine.mjs'
@@ -1490,7 +1490,7 @@ async function openInterviewIntake(){
   $('#dialog').classList.add('template-dialog')
   async function load(){
     editor.replaceChildren();notice.textContent='読み込み中…';pending=true
-    try{record=demo?{revision:0,draft:intakeTemplate,active:false,readiness:['公開デモでは実LINEに配信できません。']}:await api(path+'/'+channel)
+    try{record=demo?(()=>{const t=readState().stores.find(x=>x.id===targetStore);return {revision:t.intakeDraft?1:0,draft:t.intakeDraft??intakeTemplate,active:!!t.intakeLive,readiness:t.line&&t.setup.auto_enabled?[]:['デモのLINE接続・配信ONを先に操作してください。']}})():await api(path+'/'+channel)
       draft=structuredClone(record.draft);changed=false;checked=false;draw()
     }finally{pending=false}
   }
@@ -1510,12 +1510,12 @@ async function openInterviewIntake(){
     const status=node('div',null,'intake-status')
     const proof=field('プレビューで質問・予約・通知の順序を確認した',checked,v=>{checked=v;refreshButtons()},{type:'checkbox'})
     const proofCheck=proof.querySelector('input')
-    const save=button('店舗の下書きに保存',async()=>{if(pending)return;pending=true;refreshButtons();try{if(demo){record={...record,revision:1,draft:structuredClone(draft)}}else record=await api(path,'PUT',{channel,revision:record.revision,settings:draft});changed=false;checked=false;draw();announce('下書きを保存しました。まだ配信は行っていません。')}finally{pending=false;refreshButtons()}},'primary')
-    const publish=button(record.active?'変更を公開する':'この型を公開する',async()=>{if(pending||changed||!checked||!record.revision)return;if(!confirm('選択した公式LINEで、新しい応募者向けのトークを開始します。公開してよろしいですか？'))return;pending=true;refreshButtons();try{record=await api(path+'/action','POST',{channel,revision:record.revision,action:'publish'});changed=false;checked=false;draw();announce('面談の基本の型を公開しました。')}finally{pending=false;refreshButtons()}},'primary')
-    const stop=button('この型の自動案内を停止',async()=>{if(pending||!record.active)return;if(!confirm('この店舗のLINEトーク型だけを停止します。確定済みの予約は残ります。よろしいですか？'))return;pending=true;refreshButtons();try{record=await api(path+'/action','POST',{channel,revision:record.revision,action:'stop'});draft=structuredClone(record.draft);changed=false;checked=false;draw();announce('面談の基本の型を停止しました。')}finally{pending=false;refreshButtons()}})
+    const save=button('店舗の下書きに保存',async()=>{if(pending)return;pending=true;refreshButtons();try{if(demo){record={...record,revision:1,draft:structuredClone(draft)};const s=readState(),t=s.stores.find(x=>x.id===targetStore);t.intakeDraft=structuredClone(draft);writeState(s)}else record=await api(path,'PUT',{channel,revision:record.revision,settings:draft});changed=false;checked=false;draw();announce('下書きを保存しました。まだ配信は行っていません。')}finally{pending=false;refreshButtons()}},'primary')
+    const publish=button(record.active?'変更を公開する':'この型を公開する',async()=>{if(pending||changed||!checked||!record.revision)return;if(!confirm('選択した公式LINEで、新しい応募者向けのトークを開始します。公開してよろしいですか？'))return;pending=true;refreshButtons();try{if(demo){const s=readState(),t=s.stores.find(x=>x.id===targetStore);t.intakeLive=true;writeState(s);record={...record,active:true,live_revision:0};}else record=await api(path+'/action','POST',{channel,revision:record.revision,action:'publish'});changed=false;checked=false;draw();announce('面談の基本の型を公開しました。')}finally{pending=false;refreshButtons()}},'primary')
+    const stop=button('この型の自動案内を停止',async()=>{if(pending||!record.active)return;if(!confirm('この店舗のLINEトーク型だけを停止します。確定済みの予約は残ります。よろしいですか？'))return;pending=true;refreshButtons();try{if(demo){const s=readState(),t=s.stores.find(x=>x.id===targetStore);t.intakeLive=false;writeState(s);record={...record,active:false};}else record=await api(path+'/action','POST',{channel,revision:record.revision,action:'stop'});draft=structuredClone(record.draft);changed=false;checked=false;draw();announce('面談の基本の型を停止しました。')}finally{pending=false;refreshButtons()}})
     const reset=button('標準文面に戻す',()=>{if(confirm('編集欄を標準の文面に戻します。保存するまで変更は反映されません。')){draft=structuredClone(intakeTemplate);changed=true;checked=false;draw()}})
     actions.append(reset,save,publish);if(record.active)actions.append(stop)
-    function refreshButtons(){save.disabled=pending||!changed&&!!record.revision;publish.disabled=demo||pending||changed||!checked||!record.revision||!!record.readiness.length;stop.disabled=pending||!record.active;picker.querySelector('select').disabled=pending}
+    function refreshButtons(){save.disabled=pending||!changed&&!!record.revision;publish.disabled=pending||changed||!checked||!record.revision||!!record.readiness.length;stop.disabled=pending||!record.active;picker.querySelector('select').disabled=pending}
     function refresh(){
       const example={name:'応募者サンプル',store:'店舗（サンプル）',booking:'11月30日 19:00'}
       preview.replaceChildren(node('h3','LINEの流れ（架空のプレビュー）'))
@@ -1718,6 +1718,7 @@ async function start() {
   select.value=initialStore.id
   await refreshStore(initialStore)
   ready=true
+  const requestedStart=new URLSearchParams(location.search).get('start');if(['intake','wizard'].includes(requestedStart)){const u=new URL(location.href);u.searchParams.delete('start');history.replaceState(null,'',u);if(requestedStart==='intake')await openInterviewIntake();else openPurposePicker()}
   if(!requestedScenario&&scenarioList.length&&!$('#dialog').open){choosePiece('library')}
   setInterval(pollPresence,45000);setInterval(()=>{if(!document.hidden&&!$('#dialog').open)refreshReadiness().catch(()=>{})},60000);addEventListener('focus',()=>{if(!$('#dialog').open)refreshReadiness().catch(()=>{})})
   const templateRequest=new URLSearchParams(location.search).get('tag-template')
